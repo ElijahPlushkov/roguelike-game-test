@@ -15,4 +15,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $login->loginUser();
 
     header("location: main-menu.php");
+    exit();
 }

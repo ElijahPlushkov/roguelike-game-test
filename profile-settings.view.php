@@ -1,22 +1,3 @@
-<?php
-session_start();
-
-include "Dbh.php";
-include "user-profile.model.php";
-include "user-profile.controller.php";
-
-$id = $_SESSION["id"] ?? null;
-$username = $_SESSION["username"] ?? null;
-
-$profileInfo = new ProfileController($id, $username);
-
-//if ($_SERVER["REQUEST_METHOD"] === "POST") {
-//    $about = htmlspecialchars($_POST["about"] ?? '');
-//}
-
-$profileData = $profileInfo->getCurrentProfile($id);
-$about = $profileInfo->displayAbout($id);
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +9,7 @@ $about = $profileInfo->displayAbout($id);
 <div class="container">
     <h2>Edit Profile</h2>
 
-    <form action="user-profile.php" method="post" class="auth-form">
+    <form action="user-profile.php" method="POST" class="auth-form">
         <div>
             <p><strong>Username:</strong> <?php echo htmlspecialchars($_SESSION["username"]); ?></p>
         </div>
@@ -37,7 +18,7 @@ $about = $profileInfo->displayAbout($id);
         <textarea id="about" name="about"><?php echo htmlspecialchars($about); ?></textarea>
 
         <div class="button-group">
-            <button type="submit" name="edit-profile">Save Changes</button>
+            <button type="submit" name="save-changes">Save Changes</button>
             <button type="button">Cancel</button>
         </div>
     </form>

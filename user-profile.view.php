@@ -1,11 +1,3 @@
-<?php
-session_start();
-
-$id = $_SESSION['id'];
-$username = $_SESSION['username'] ?? '';
-$about = $about ?? '';
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,8 +25,8 @@ $about = $about ?? '';
                 <li>High Score: <span class="stat-value">-</span></li>
             </ul>
         </div>
-        <form action="profile-settings.view.php" method="get" class="auth-form">
-            <button type="submit">Edit Profile</button>
+        <form action="user-profile.php" method="POST" class="auth-form">
+            <button type="submit" name="edit-profile">Edit Profile</button>
         </form>
 
         <form action="main-menu.php" method="get" class="auth-form">

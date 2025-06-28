@@ -41,8 +41,8 @@
         <button type="submit" name="logout">Logout</button>
     </form>
 
-    <form action="user-profile.php" method="get" class="auth-form">
-        <button type="submit">Your Profile</button>
+    <form action="user-profile.php" method="POST" class="auth-form">
+        <button type="submit" name="user-profile">Your Profile</button>
     </form>
 </div>
 </body>

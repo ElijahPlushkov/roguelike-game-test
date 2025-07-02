@@ -25,11 +25,11 @@
                 <li>High Score: <span class="stat-value">-</span></li>
             </ul>
         </div>
-        <form action="../auth/user-profile.php" method="POST" class="auth-form">
+        <form action="user-profile" method="POST" class="auth-form">
             <button type="submit" name="edit-profile">Edit Profile</button>
         </form>
 
-        <form action="../game/main-menu.php" method="get" class="auth-form">
+        <form action="main-menu" method="GET" class="auth-form">
             <button type="submit">Back to Menu</button>
         </form>
 

@@ -9,7 +9,7 @@
 <div class="container">
     <h2>Edit Profile</h2>
 
-    <form action="../auth/user-profile.php" method="POST" class="auth-form">
+    <form action="user-profile" method="POST" class="auth-form">
         <div>
             <p><strong>Username:</strong> <?php echo htmlspecialchars($_SESSION["username"]); ?></p>
         </div>

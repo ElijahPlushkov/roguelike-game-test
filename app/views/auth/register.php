@@ -22,6 +22,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $profileInfo = new ProfileController($id, $username);
     $profileInfo->defaultProfileInfo();
 
-    header("location: /roguelike-game/app/views/game/main-menu.php");
+    header("location: " . BASE_PATH . "/main-menu");
     exit();
 }

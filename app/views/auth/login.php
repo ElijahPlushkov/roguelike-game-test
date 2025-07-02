@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     //validate and login
     $login->loginUser();
-
-    header("Location: /roguelike-game/app/views/game/main-menu.php");
-    exit();
 }
+
+header("Location: " . BASE_PATH . "/main-menu");
+exit();

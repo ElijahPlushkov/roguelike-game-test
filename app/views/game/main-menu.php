@@ -1,26 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Game Main Menu</title>
-    <link rel="stylesheet" href="/roguelike-game/public/assets/styles.css">
-</head>
-<body>
-<header>
-    <?php
-    session_start();
-    echo "<pre>";
-    print_r($_SESSION);
-    echo "</pre>";
-    if (isset($_SESSION["id"])) {
-        echo "<p>Welcome, ".htmlspecialchars($_SESSION["username"])."! You are logged in.</p>";
-        unset($_SESSION["error"]);
-    } else {
-        echo "<p>You are not logged in</p>";
-    }
-    ?>
-</header>
+<?php
 
+require_once __DIR__ . "/../layouts/header.php";
+
+?>
+
+<body>
 <div class="container">
     <h2>Register</h2>
     <form action="register" method="POST" class="auth-form">
@@ -43,6 +27,10 @@
 
     <form action="user-profile" method="POST" class="auth-form">
         <button type="submit" name="user-profile">Your Profile</button>
+    </form>
+
+    <form action="game" method="POST" class="auth-form">
+        <button type="submit" name="game">Play</button>
     </form>
 </div>
 </body>

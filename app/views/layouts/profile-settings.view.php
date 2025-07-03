@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Profile</title>
-    <link rel="stylesheet" href="/roguelike-game/public/assets/styles.css">
-</head>
+<?php
+
+require_once __DIR__ . "/../layouts/header.php";
+
+?>
+
 <body>
 <div class="container">
     <h2>Edit Profile</h2>

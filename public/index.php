@@ -13,6 +13,10 @@ $router = new RouterController();
 
 $router->add("GET", "/main-menu", [RouterController::class, "mainMenu"]);
 
+$router->add("GET", "/", [RouterController::class, "mainMenu"]);
+
+$router->add("POST", "/game", [RouterController::class, "game"]);
+
 $router->add("POST", "/login", [RouterController::class, "login"]);
 
 $router->add("POST", "/register", [RouterController::class, "register"]);
@@ -29,7 +33,6 @@ if (str_starts_with($path, $basePath)) {
     $path = substr($path, strlen($basePath));
 }
 
-// Fallback to root if empty
 if (empty($path)) {
     $path = '/';
 }

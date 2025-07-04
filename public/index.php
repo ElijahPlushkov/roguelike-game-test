@@ -6,8 +6,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 file_put_contents('debug.log', "INDEX.PHP was called\n", FILE_APPEND);
 
-require '../app/core/router.model.php';
-require '../app/core/router.controller.php';
+require '../core/router.model.php';
+require '../core/router.controller.php';
 
 $router = new RouterController();
 

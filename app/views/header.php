@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Game Main Menu</title>
-    <link rel="stylesheet" href="/roguelike-game/public/assets/styles.css">
-</head>
-
 <?php
 session_start();
 echo "<pre>";
@@ -18,3 +10,11 @@ if (isset($_SESSION["id"])) {
     echo "<p>You are not logged in</p>";
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Menu</title>
+    <link rel="stylesheet" href="/../roguelike-game/public/assets/styles.css">
+</head>

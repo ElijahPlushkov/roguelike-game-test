@@ -71,9 +71,9 @@ require_once __DIR__ . "/../views/header.php";
     <section class="menu__container">
 
         <?php if (isset($_SESSION["id"])) : ?>
-            <div class="menu__button">
-                New Game
-            </div>
+            <form action="game" method="POST">
+                <button type="submit" class="menu__button">New Game</button>
+            </form>
 
             <div class="menu__button">
                 Load Game

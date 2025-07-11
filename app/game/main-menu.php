@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . "/../views/header.php";
-
+include __DIR__ . "/../auth/user-profile.php";
 ?>
 
 
@@ -40,11 +40,11 @@ require_once __DIR__ . "/../views/header.php";
             <div class="profile-section">
                 <div class="profile-info">
                     <p><strong>Username:</strong>
-                        username
+                        <?php echo htmlspecialchars($_SESSION["username"]); ?>
                     </p>
                     <p><strong>Description:</strong></p>
                     <p class="description">
-                        ready for a challenge
+                        <?php echo htmlspecialchars($about); ?>
                     </p>
                 </div>
 
@@ -60,11 +60,6 @@ require_once __DIR__ . "/../views/header.php";
                 <form action="user-profile" method="POST">
                     <button type="submit" name="edit-profile" class="menu__button">Edit Profile</button>
                 </form>
-
-<!--                <form action="main-menu" method="GET">-->
-<!--                    <button type="submit" class="menu__button">Back to Menu</button>-->
-<!--                </form>-->
-
             </div>
         </section>
     <?php endif; ?>

@@ -7,14 +7,14 @@ class Login extends Dbh {
         if(!$stmt->execute([$username])) {
             $stmt = null;
             $_SESSION['error'] = 'stmtfailed';
-            header("location: main-menu.php");
+            header("location: main-menu.view.php");
             exit();
         }
 
         if ($stmt->rowCount() === 0) {
             $stmt = null;
             $_SESSION['error'] = 'usernotfound';
-            header("location: main-menu.php");
+            header("location: main-menu.view.php");
             exit();
         }
 
@@ -23,7 +23,7 @@ class Login extends Dbh {
         if (!password_verify($password, $user["password"])) {
             $stmt = null;
             $_SESSION['error'] = 'wrongpassword';
-            header("location: main-menu.php");
+            header("location: main-menu.view.php");
             exit();
         }
 

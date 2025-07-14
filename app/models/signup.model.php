@@ -6,7 +6,7 @@ class Signup extends Dbh {
 
         if (!$stmt->execute(array($username))) {
             $stmt = null;
-            header("location: main-menu.php");
+            header("location: main-menu.view.php");
             exit();
         }
 
@@ -27,7 +27,7 @@ class Signup extends Dbh {
 
         if (!$stmt->execute(array($username, $hashedPassword))) {
             $stmt = null;
-            header("location: main-menu.php");
+            header("location: main-menu.view.php");
             exit();
         }
 
@@ -46,7 +46,7 @@ class Signup extends Dbh {
 
         if ($stmt->rowCount() === 0) {
             $stmt = null;
-            header("location: main-menu.php");
+            header("location: main-menu.view.php");
             exit();
         }
 

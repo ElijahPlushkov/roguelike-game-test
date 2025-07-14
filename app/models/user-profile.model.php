@@ -7,16 +7,17 @@ class ProfileInfo extends Dbh {
 
         if (!$stmt->execute([$id])) {
             $stmt = null;
-            header("location: main-menu.php");
+            header("location: /main-menu");
             exit();
         }
-
-        if ($stmt->rowCount() === 0) {
-            $stmt = null;
-            $_SESSION["error"] = "profilenotfound";
-            header("location: main-menu.php");
-            exit();
-        }
+//
+//        if ($stmt->rowCount() === 0) {
+//            $stmt = null;
+//            $_SESSION["error"] = "profilenotfound";
+//            header("location: /main-menu");
+//
+//            exit();
+//        }
 
         $profileData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -29,7 +30,7 @@ class ProfileInfo extends Dbh {
         if (!$stmt->execute([$about, $id])) {
             $stmt = null;
             $_SESSION["error"] = "cannotupdate";
-            header("location: user-profile.php");
+//            header("location: user-profile");
             exit();
         }
         $stmt = null;
@@ -41,7 +42,7 @@ class ProfileInfo extends Dbh {
         if (!$stmt->execute([$id, $about])) {
             $stmt = null;
             $_SESSION["error"] = "cannotsetprofileinfo";
-            header("location: user-profile.php");
+//            header("location: user-profile");
             exit();
         }
         $stmt = null;

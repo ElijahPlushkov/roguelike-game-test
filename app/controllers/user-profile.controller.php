@@ -18,15 +18,13 @@ class ProfileController extends ProfileInfo {
         $this->editProfileInfo($id, $about);
     }
 
-    public function getCurrentProfile($id) {
-        $profileInfo = $this->getProfileInfo($id);
-
-        return $profileInfo;
+    public function getCurrentProfile($id): array {
+        $profileModel = new ProfileInfo();
+        return $profileModel->getProfileInfo($this->id ?? $id);
     }
 
     public function displayAbout($id) {
         $profileData = $this->getCurrentProfile($id);
-        $about =  $profileData[0]["about"];
-        return $about;
+        return $profileData[0]["about"];
     }
 }

@@ -11,17 +11,17 @@ class SignupController extends Signup {
 
     public function validateUserInput() {
         if ($this->emptyInput() === false) {
-            header("Location: main-menu.php");
+            header("Location: main-menu.view.php");
             exit();
         }
 
         if ($this->invalidUsername() === false) {
-            header("Location: main-menu.php");
+            header("Location: main-menu.view.php");
             exit();
         }
 
         if ($this->usernameTaken() === false) {
-            header("Location: main-menu.php");
+            header("Location: main-menu.view.php");
             exit();
         }
 

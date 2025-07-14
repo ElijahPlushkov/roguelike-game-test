@@ -15,7 +15,7 @@ class LoginController extends Login
     {
         if ($this->emptyInput()) {
             $_SESSION['error'] = "emptyinput";
-            header("Location: main-menu.php");
+            header("Location: main-menu.view.php");
             exit();
         }
 

@@ -2,10 +2,6 @@
 
 session_start();
 
-echo '<pre>';
-print_r($_POST);
-echo '</pre>';
-
 include __DIR__ . "/../../core/Dbh.php";
 include __DIR__ . "/../models/user-profile.model.php";
 include __DIR__ . "/../controllers/user-profile.controller.php";
@@ -39,6 +35,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["edit-profile"])) {
 $profileData = $profileInfo->getCurrentProfile($id);
 $about = $profileInfo->displayAbout($id);
 
-echo '<pre>';
-print_r($profileData);
-echo '</pre>';

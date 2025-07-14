@@ -24,4 +24,8 @@ class RouterController extends Router{
     public function game() {
         require __DIR__ . "/../app/game/game.php";
     }
+
+    public function movement() {
+        require __DIR__ . "/../app/game/movement.controller.php";
+    }
 }

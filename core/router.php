@@ -9,7 +9,7 @@ require '../core/router.controller.php';
 
 $router = new RouterController();
 
-$router->add("GET", "/main-menu", [RouterController::class, "mainMenu"]);
+$router->add("POST", "/main-menu", [RouterController::class, "mainMenu"]);
 
 $router->add("GET", "/", [RouterController::class, "mainMenu"]);
 

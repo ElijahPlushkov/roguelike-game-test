@@ -1,20 +1,21 @@
 <?php
 
 require_once __DIR__ . "/../views/header.php";
-require "map-generator.model.php";
-require "tiles.model.php";
-require "map-generator.controller.php";
 
-echo "here will be the main game screen";
-
-$map = new createGameMap();
-$map->createEarthTiles(20);
-
+echo "here will be the game screen";
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PHP Rogue-like</title>
+
+</head>
+<body>
 <section class="map-display">
-    <?php
-    echo $map->getOutput();
-    ?>
+
 </section>
 
+</body>
+</html>

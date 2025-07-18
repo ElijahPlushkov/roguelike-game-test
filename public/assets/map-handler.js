@@ -6,6 +6,7 @@ function loadLevel() {
         .then(response => response.json())
         .then(data => {
             map = data.tilemap;
+            console.log(map);
             player = data.player;
             render();
         })
@@ -54,12 +55,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function render() {
-    const tileTypes = {
-        '#': { walkable: false, char: '#' },
-        '.': { walkable: true,  char: '.' },
-        'T': { walkable: false, char: 'T' },
-        'N' : {walkable: true, char: 'N'}
-    };
+    // const tileTypes = {
+    //     "T": { "type": "tree", "walkable": false },
+    //     "#": { "type": "wall", "walkable": false },
+    //     ".": { "type": "floor", "walkable": true },
+    //     "E": { "type": "enemy", "walkable": true },
+    //     "D": { "type": "door", "walkable": true },
+    //     "N": { "type": "npc", "walkable": true },
+    //     "o": { "type": "item", "walkable": true }
+    // };
 
     let output = "";
 
@@ -69,16 +73,25 @@ function render() {
                 output += "@";
             }
             else if (map[y][x] === "#") {
-                output += tileTypes["#"].char;
+                output += "#";
             }
             else if (map[y][x] === ".") {
-                output += tileTypes["."].char;
+                output += ".";
             }
             else if (map[y][x] === "T") {
-                output += tileTypes["T"].char;
+                output += "T";
             }
             else if (map[y][x] === "N") {
-                output += tileTypes["N"].char;
+                output += "N";
+            }
+            else if (map[y][x] === "o") {
+                output += "o";
+            }
+            else if (map[y][x] === "D") {
+                output += "D";
+            }
+            else if (map[y][x] === "E") {
+                output += "E";
             }
         }
         output += "\n";

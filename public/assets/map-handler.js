@@ -1,12 +1,14 @@
 let map = [];
 let player = { x: 0, y: 0 };
+let dialogueData = {};
+let currentState = "greetings";
+let eventActive = false;
 
 function loadLevel() {
     fetch("/roguelike-game/load-level")
         .then(response => response.json())
         .then(data => {
             map = data.tilemap;
-            console.log(map);
             player = data.player;
             render();
         })
@@ -19,6 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loadLevel();
 
     document.addEventListener("keydown", (e) => {
+        if (eventActive) {
+            return;
+        }
+
         let dx = 0, dy = 0;
 
         const adventureLog = document.getElementById("adventure-log");
@@ -40,15 +46,26 @@ document.addEventListener("DOMContentLoaded", () => {
             if (map[newY][newX] === "#") {
                 player.x = player.x - dx;
                 player.y = player.y - dy;
-                console.log("you can't walk here");
                 const newLogEntry = document.createElement("p");
                 newLogEntry.textContent = "you can't walk here";
                 adventureLog.appendChild(newLogEntry);
             }
             if (map[newY][newX] === "N") {
+                const slug = "spider_talk_1";
+                if (!hasSeenEvent(slug)) {
+                    loadScriptData(slug, ()=> {
+                        eventActive = true;
+                        initDialogue();
+                        markEventSeen(slug);
+                    });
+                }
+                else {
+                    console.log("I have nothing more to say");
+                }
 
-                initDialogue(currentState);
+
             }
+
             render();
         }
     });
@@ -100,47 +117,32 @@ function render() {
     document.getElementById("game").textContent = output;
 }
 
-function getDialogueData() {
-    return {
-        'greetings': {
-            'description': 'you see a spider',
-            'options': [
-                { key: 'talk', label: 'can I help you?' },
-                { key: 'fight', label: 'I will fight you' }
-            ],
-            'outcomes': {
-                'fight': 'death',
-                'talk': 'talk'
-            }
-        },
-        'death': {
-            'description': 'you couldn’t fight the spider, you are now dead',
-            'options': []
-        },
-        'talk': {
-            'description': 'you are now friends with the spider',
-            'options': []
-        }
-    };
+function loadScriptData(slug, callback) {
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(script => {
+            dialogueData = script;
+            currentState= "greetings";
+            callback();
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
 }
 
-let currentState = 'greetings';
-
-function initDialogue(state) {
-
-    const dialogue = getDialogueData();
-    const dialogueState = dialogue[state];
-    document.getElementById('description').textContent = dialogueState.description;
+function initDialogue() {
+    const state = dialogueData[currentState];
+    document.getElementById('description').textContent = state.description;
 
     const optionsDiv = document.getElementById('options');
     optionsDiv.innerHTML = '';
 
-    dialogueState.options.forEach(option => {
+    state.options.forEach(option => {
         const button = document.createElement("button");
         button.textContent = option.label;
         button.className = 'option-button';
-        button.addEventListener("click", ()=> {
-            const nextState = dialogueState.outcomes[option.key];
+        button.addEventListener("click", () => {
+            const nextState = state.outcomes?.[option.key];
             if (nextState) {
                 currentState = nextState;
                 initDialogue(currentState);
@@ -148,4 +150,27 @@ function initDialogue(state) {
         });
         optionsDiv.appendChild(button);
     });
+
+    if (!state.options || state.options.length === 0) {
+        const continueButton = document.createElement("button");
+        continueButton.textContent = "Continue";
+        continueButton.className = "option-button";
+        optionsDiv.appendChild(continueButton);
+        continueButton.addEventListener("click", () => {
+            endEvent();
+            optionsDiv.removeChild(continueButton);
+        });
+    }
+}
+
+function endEvent() {
+    eventActive = false;
+}
+
+function hasSeenEvent(slug) {
+    return localStorage.getItem(`event_${slug}`) === "true";
+}
+
+function markEventSeen(slug) {
+    localStorage.setItem(`event_${slug}`, "true");
 }

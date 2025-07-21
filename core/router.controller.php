@@ -25,7 +25,27 @@ class RouterController extends Router{
         require __DIR__ . "/../app/game/game.php";
     }
 
-    public function movement() {
-        require __DIR__ . "/../app/game/movement.controller.php";
+    public function loadLevel() {
+        require __DIR__ . "/../app/game/load-level.php";
+    }
+
+    public function uploadLevelController() {
+        require __DIR__ . "/../app/controllers/upload-level.controller.php";
+    }
+
+    public function uploadLevel() {
+        require __DIR__ . "/../app/views/upload-level.view.php";
+    }
+
+    public function loadScript() {
+        require __DIR__ . "/../app/game/load-script.php";
+    }
+
+    public function scriptLoaderController() {
+        require __DIR__ . "/../app/controllers/script-loader.controller.php";
+    }
+
+    public function uploadScript() {
+        require __DIR__ . "/../app/views/upload-script.view.php";
     }
 }

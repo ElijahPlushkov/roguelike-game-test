@@ -1,21 +1,34 @@
 <?php
 
 require_once __DIR__ . "/../views/header.php";
-
-echo "here will be the game screen";
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>PHP Rogue-like</title>
 
-</head>
 <body>
-<section class="map-display">
-
+<section id="players-info">
+    <h4>displays player's info (reputation, health, mana, etc)</h4>
 </section>
 
+<section class="map-display">
+    <div id="game" class="tile-grid"></div>
+</section>
+
+
+<section id="adventure-log">
+    <h4>Adventure log</h4>
+    <div id="dialogueWindow">
+        <p id="description"></p>
+        <div id="options">
+
+        </div>
+    </div>
+</section>
+
+
+<br>
+<br>
+<button onclick="clearStorage()" id="clear-storage"></button>
+
+<script src="/roguelike-game/public/assets/map-handler.js"></script>
 </body>
 </html>

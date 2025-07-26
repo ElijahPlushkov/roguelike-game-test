@@ -1,0 +1,105 @@
+/* === Root Color Palette === */
+:root {
+    --background-color: #E6F0EC;
+    --surface-color: whitesmoke;
+    --border-color: #A7C3B7;
+    --accent-color: #6FA89C;
+    --accent-hover: #5F978B;
+    --text-color: #3F5F5A;
+    --green-1: #A3B186;
+    --green-2: #5B754A;
+    --green-3: #4E9B31;
+}
+
+/* === Reset === */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 100vh;
+}
+
+#players-info {
+    text-align: center;
+    width: 1024px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--surface-color);
+}
+
+.map-display {
+    width: 1024px;
+    height: 60vh;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--surface-color);
+}
+
+#adventure-log {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    width: 1024px;
+    height: 30vh;
+    background-color: var(--surface-color);
+}
+
+#clear-storage {
+    width: 10px;
+    height: 10px;
+}
+
+.tile-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.tile-row {
+    display: flex;
+}
+
+.tile {
+    width: 20px;
+    height: 20px;
+    color: black;
+    font-size: 16px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.wall {
+    background-color: #3A3D35;
+}
+
+.floor {
+    background-color: #D9E6DA;
+}
+
+.tree {
+    background-color: #5B8C5A;
+}
+
+.npc {
+    background-color: #7BB0A2;
+}
+
+.enemy {
+    background-color: #A94E4E;
+}
+
+.item {
+    background-color: #D6B75D;
+}
+
+.door {
+    background-color: #A3B186;
+}
+
+.player {
+    background-color: #4E9B31;
+}

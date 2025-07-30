@@ -1,0 +1,150 @@
+/* === Root Color Palette === */
+:root {
+    --background-color: #1e1e1e;
+    --surface-color: #1e1e1e;
+    /*--border-color: #A7C3B7;*/
+    --accent-color: #6FA89C;
+    --accent-hover: #5F978B;
+    --text-color: #3F5F5A;
+    --green-1: #A3B186;
+    --green-2: #5B754A;
+    --green-3: #4E9B31;
+}
+
+/* === Reset === */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: "Cascadia Code", sans-serif;
+    height: 100vh;
+}
+
+.game-info {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    margin: 10px;
+}
+
+.players-info {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.menu__link {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.level-title__heading {
+    margin: 10px;
+}
+
+.map-display {
+    width: 1024px;
+    border-radius: 5px;
+}
+
+.adventure-log {
+    border-radius: 5px;
+    width: 1024px;
+    overflow-y: scroll;
+    height: 30vh;
+    font-size: 12px;
+}
+
+.adventure-log__divider {
+    display: flex;
+    justify-content: center;
+}
+
+.adventure-log__new-event {
+    color: cornflowerblue;
+}
+
+.log-entry {
+    color: chocolate;
+}
+
+.dialogue-color {
+    color: honeydew;
+}
+
+.dialogue-button {
+    font-size: 12px;
+    color: honeydew;
+    background: #3F5F5A;
+    border: 1px solid black;
+    border-radius: 3px;
+    margin: 5px;
+    padding: 3px;
+}
+
+#clear-storage {
+    width: 10px;
+    height: 10px;
+}
+
+.tile-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.tile-row {
+    display: flex;
+}
+
+.tile {
+    width: 20px;
+    height: 20px;
+    color: black;
+    font-size: 16px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.wall {
+    background-color: #3A3D35;
+}
+
+.floor {
+    background-color: #D9E6DA;
+}
+
+.tree {
+    background-color: #5B8C5A;
+}
+
+.npc {
+    background-color: #7BB0A2;
+}
+
+.enemy {
+    background-color: #A94E4E;
+}
+
+.item {
+    background-color: #D6B75D;
+}
+
+.door {
+    background-color: #A3B186;
+}
+
+.player {
+    background-color: #4E9B31;
+}

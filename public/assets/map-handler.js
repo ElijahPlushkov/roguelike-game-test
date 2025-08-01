@@ -1,16 +1,29 @@
+//constants
 let map = [];
 let player = { x: 0, y: 0 };
-let scriptData = {};
-let currentState = "";
+
+let levelData = {};
+
+let dialogueData = {};
+let stateKey = "";
+
+let eventData = {};
+
+let itemData = {};
+
+let enemyData = {};
+
 let eventActive = false;
 const adventureLog = document.querySelector(".adventure-log");
 
-function loadLevel() {
+//load data
+function loadLevelData() {
     fetch("/roguelike-game/load-level")
         .then(response => response.json())
-        .then(data => {
-            map = data.tilemap;
-            player = data.player;
+        .then(level => {
+            map = level.tilemap;
+            player = level.player;
+            levelData = level;
             render();
         })
         .catch(err => {
@@ -18,8 +31,60 @@ function loadLevel() {
         });
 }
 
+function loadDialogueData() {
+    const slug = "chapter_1_dialogues";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(dialogues => {
+            dialogueData = dialogues;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
+function loadEventData() {
+    const slug = "chapter_1_events";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(events => {
+            eventData = events;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
+function loadItemData() {
+    const slug = "chapter_1_items";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(items => {
+            itemData = items;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
+function loadEnemyData() {
+    const slug = "chapter_1_enemies";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(enemies => {
+            enemyData = enemies;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-    loadLevel();
+    loadLevelData();
+    loadDialogueData();
+    loadEventData();
+    loadItemData();
+    loadEnemyData();
 
     document.addEventListener("keydown", (e) => {
         if (eventActive) {
@@ -42,35 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (map[newY][newX]) {
             player.x = newX;
             player.y = newY;
-            if (map[newY][newX] === "#") {
-                blockedPath(dx, dy);
-            }
 
-            if (player.y === 2 && player.x === 8) {
-                const slug = "spider_talk_1";
-                currentState = "greetings";
-                if (!hasSeenEvent(slug)) {
-                    loadScriptData(slug, ()=> {
-                        eventActive = true;
-                        initDialogue();
-                        markEventSeen(slug);
-                    });
-                }
-                else {
-                    console.log("I have nothing more to say");
-                }
-            }
+            checkForAnyEvent(player.x, player.y);
 
-            if (player.y === 2 && player.x === 2) {
-                const slug = "arrival_to_chyceen";
-                if (!hasSeenEvent(slug)) {
-                    loadScriptData(slug, ()=> {
-                        eventActive = true;
-                        initEvent();
-                        markEventSeen(slug);
-                    });
-                }
-            }
             render();
         }
     });
@@ -131,62 +170,93 @@ function render() {
     }
 }
 
-function loadScriptData(slug, callback) {
-    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
-        .then(response => response.json())
-        .then(script => {
-            scriptData = script;
-            callback();
-        })
-        .catch(err => {
-            console.error("Failed to load script:", err);
-        });
+function checkForAnyEvent(x, y) {
+
+    const allEvents = [
+        ...(levelData.layers.events || []),
+        ...(levelData.layers.dialogues || [])
+    ]
+
+    const newEvent = allEvents.find(event => event.x === x && event.y === y);
+
+    if (newEvent) {
+        if (newEvent.type === "event") {
+            const eventSlug = newEvent.slug;
+            if (!hasSeenEvent(eventSlug)) {
+                eventActive = true;
+                initEvent(eventSlug);
+                markEventSeen(eventSlug);
+            }
+        }
+
+        if (newEvent.type === "dialogue") {
+            const dialogueSlug = newEvent.slug;
+            if (!hasSeenEvent(dialogueSlug)) {
+                eventActive = true;
+                initDialogue(dialogueSlug, stateKey);
+                markEventSeen(dialogueSlug);
+            }
+        }
+    }
 }
 
-function initEvent() {
-    const event = scriptData.event;
+function initEvent(eventSlug) {
+
+    const event = eventData.events.find(event => event.slug === eventSlug);
+
     const newEvent = document.createElement("div");
     newEvent.className = "adventure-log__new-event";
-    newEvent.textContent = event;
+    newEvent.textContent = event.event;
     adventureLog.prepend(newEvent);
 
     const continueButton = document.createElement("button");
     continueButton.textContent = "Continue";
     continueButton.className = "dialogue-button";
     newEvent.appendChild(continueButton);
-    continueButton.addEventListener("click", () => {
+    continueButton.addEventListener("click", ()=> {
         endEvent();
         newEvent.removeChild(continueButton);
     });
 }
 
-function initDialogue() {
-    const state = scriptData[currentState];
+function initDialogue(dialogueSlug, stateKey) {
+
+    const dialogue = dialogueData.dialogues.find(dialogue => dialogue.slug === dialogueSlug);
+    const currentStateKey = stateKey || dialogue.start || "greetings";
+    const currentState = dialogue[currentStateKey];
+
+    if (!currentState) {
+        console.error(`State "${currentStateKey}" not found in dialogue "${dialogueSlug}"`);
+        return;
+    }
+    console.log(currentState);
+
     const description = document.createElement("p");
-    adventureLog.prepend(description);
-    description.textContent = state.description;
+    description.textContent = currentState.description;
     description.className = "dialogue-color";
+
+    adventureLog.prepend(description);
 
     const options = document.createElement("div");
     description.append(options);
     options.innerHTML = '';
 
-    state.options.forEach(option => {
-        const button = document.createElement("button");
-        button.textContent = option.label;
-        button.className = 'dialogue-button';
-        button.addEventListener("click", () => {
-            const nextState = state.outcomes?.[option.key];
-            if (nextState) {
-                currentState = nextState;
-                initDialogue(currentState);
-                options.innerHTML = '';
-            }
-        });
-        options.appendChild(button);
-    });
+    if (currentState.options && currentState.options.length > 0) {
+        currentState.options.forEach(option => {
+            const button = document.createElement("button");
+            button.textContent = option.label;
+            button.className = 'dialogue-button';
 
-    if (!state.options || state.options.length === 0) {
+            button.addEventListener("click", () => {
+                const nextStateKey = currentState.outcomes?.[option.key];
+                if (nextStateKey) {
+                    options.innerHTML = '';
+                    initDialogue(dialogueSlug, nextStateKey);
+                }
+            });
+            options.appendChild(button);
+        });
+    } else {
         const continueButton = document.createElement("button");
         continueButton.textContent = "Continue";
         continueButton.className = "dialogue-button";

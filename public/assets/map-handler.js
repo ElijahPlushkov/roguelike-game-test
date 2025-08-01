@@ -1,16 +1,29 @@
+//constants
 let map = [];
 let player = { x: 0, y: 0 };
-let scriptData = {};
+
+let levelData = {};
+
+let dialogueData = {};
 let currentState = "";
+
+let eventData = {};
+
+let itemData = {};
+
+let enemyData = {};
+
 let eventActive = false;
 const adventureLog = document.querySelector(".adventure-log");
 
-function loadLevel() {
+//load data
+function loadLevelData() {
     fetch("/roguelike-game/load-level")
         .then(response => response.json())
-        .then(data => {
-            map = data.tilemap;
-            player = data.player;
+        .then(level => {
+            map = level.tilemap;
+            player = level.player;
+            levelData = level;
             render();
         })
         .catch(err => {
@@ -18,8 +31,60 @@ function loadLevel() {
         });
 }
 
+function loadDialogueData() {
+    const slug = "chapter_1_dialogues";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(dialogues => {
+            dialogueData = dialogues;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
+function loadEventData() {
+    const slug = "chapter_1_events";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(events => {
+            eventData = events;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
+function loadItemData() {
+    const slug = "chapter_1_items";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(items => {
+            itemData = items;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
+function loadEnemyData() {
+    const slug = "chapter_1_enemies";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(enemies => {
+            enemyData = enemies;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-    loadLevel();
+    loadLevelData();
+    loadDialogueData();
+    loadEventData();
+    loadItemData();
+    loadEnemyData();
 
     document.addEventListener("keydown", (e) => {
         if (eventActive) {
@@ -42,35 +107,34 @@ document.addEventListener("DOMContentLoaded", () => {
         if (map[newY][newX]) {
             player.x = newX;
             player.y = newY;
-            if (map[newY][newX] === "#") {
-                blockedPath(dx, dy);
-            }
 
-            if (player.y === 2 && player.x === 8) {
-                const slug = "spider_talk_1";
-                currentState = "greetings";
-                if (!hasSeenEvent(slug)) {
-                    loadScriptData(slug, ()=> {
-                        eventActive = true;
-                        initDialogue();
-                        markEventSeen(slug);
-                    });
-                }
-                else {
-                    console.log("I have nothing more to say");
-                }
-            }
-
-            if (player.y === 2 && player.x === 2) {
-                const slug = "arrival_to_chyceen";
-                if (!hasSeenEvent(slug)) {
-                    loadScriptData(slug, ()=> {
-                        eventActive = true;
-                        initEvent();
-                        markEventSeen(slug);
-                    });
-                }
-            }
+            checkForEvent(player.x, player.y);
+            // if (map[newY][newX] === "#") {
+            //     blockedPath(dx, dy);
+            // }
+            //
+            // if (player.y === 2 && player.x === 8) {
+            //     const slug = "spider_talk_1";
+            //     currentState = "greetings";
+            //     if (!hasSeenEvent(slug)) {
+            //         loadScriptData(slug, ()=> {
+            //             eventActive = true;
+            //             initDialogue();
+            //             markEventSeen(slug);
+            //         });
+            //     }
+            // }
+            //
+            // if (player.y === 2 && player.x === 2) {
+            //     const slug = "arrival_to_chyceen";
+            //     if (!hasSeenEvent(slug)) {
+            //         loadScriptData(slug, ()=> {
+            //             eventActive = true;
+            //             initEvent();
+            //             markEventSeen(slug);
+            //         });
+            //     }
+            // }
             render();
         }
     });
@@ -131,34 +195,52 @@ function render() {
     }
 }
 
-function loadScriptData(slug, callback) {
-    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
-        .then(response => response.json())
-        .then(script => {
-            scriptData = script;
-            callback();
-        })
-        .catch(err => {
-            console.error("Failed to load script:", err);
-        });
+function checkForEvent(x, y) {
+    const newEvent = levelData.layers.events.find(event => event.x === x && event.y === y);
+    console.log(newEvent);
+    if (newEvent) {
+        if (newEvent.type === "event") {
+            const eventSlug = newEvent.slug;
+            initEvent(eventSlug);
+        }
+    }
 }
 
-function initEvent() {
-    const event = scriptData.event;
+function initEvent(eventSlug) {
+
+    const event = eventData.events.find(event => event.slug === eventSlug);
+
     const newEvent = document.createElement("div");
     newEvent.className = "adventure-log__new-event";
-    newEvent.textContent = event;
+    newEvent.textContent = event.event;
     adventureLog.prepend(newEvent);
 
     const continueButton = document.createElement("button");
     continueButton.textContent = "Continue";
     continueButton.className = "dialogue-button";
     newEvent.appendChild(continueButton);
-    continueButton.addEventListener("click", () => {
+    continueButton.addEventListener("click", ()=> {
         endEvent();
         newEvent.removeChild(continueButton);
     });
 }
+
+// function initEvent() {
+//     const event = scriptData.event;
+//     const newEvent = document.createElement("div");
+//     newEvent.className = "adventure-log__new-event";
+//     newEvent.textContent = event;
+//     adventureLog.prepend(newEvent);
+//
+//     const continueButton = document.createElement("button");
+//     continueButton.textContent = "Continue";
+//     continueButton.className = "dialogue-button";
+//     newEvent.appendChild(continueButton);
+//     continueButton.addEventListener("click", () => {
+//         endEvent();
+//         newEvent.removeChild(continueButton);
+//     });
+// }
 
 function initDialogue() {
     const state = scriptData[currentState];

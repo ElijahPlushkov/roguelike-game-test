@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 require __DIR__ . "/../models/upload-level.model.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "GET") {
-    $slug = "spider-nest";
+    $slug = "chapter_1";
 
     if (!$slug) {
         http_response_code(400);

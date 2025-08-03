@@ -1,6 +1,7 @@
 //constants
 let map = [];
 let player = { x: 0, y: 0 };
+let tileSet = {};
 
 let levelData = {};
 
@@ -21,9 +22,10 @@ function loadLevelData() {
     fetch("/roguelike-game/load-level")
         .then(response => response.json())
         .then(level => {
+            levelData = level;
             map = level.tilemap;
             player = level.player;
-            levelData = level;
+            tileSet = level.tileset;
             render();
         })
         .catch(err => {
@@ -108,6 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
             player.x = newX;
             player.y = newY;
 
+            isWalkable(player.x, player.y, dx, dy);
             checkForAnyEvent(player.x, player.y);
 
             render();
@@ -148,15 +151,19 @@ function render() {
                         break;
                     case "N":
                         tile.classList.add("npc");
+                        tile.textContent = "N";
                         break;
                     case "E":
                         tile.classList.add("enemy");
+                        tile.textContent = "E";
                         break;
                     case "o":
                         tile.classList.add("item");
+                        tile.textContent = "o";
                         break;
-                    case "D":
+                    case "П":
                         tile.classList.add("door");
+                        tile.textContent = "П";
                         break;
                     default:
                         tile.classList.add("unknown");
@@ -174,10 +181,13 @@ function checkForAnyEvent(x, y) {
 
     const allEvents = [
         ...(levelData.layers.events || []),
-        ...(levelData.layers.dialogues || [])
+        ...(levelData.layers.dialogues || []),
+        ...(levelData.layers.enemies || [])
     ]
 
     const newEvent = allEvents.find(event => event.x === x && event.y === y);
+
+    console.log(newEvent);
 
     if (newEvent) {
         if (newEvent.type === "event") {
@@ -197,7 +207,34 @@ function checkForAnyEvent(x, y) {
                 markEventSeen(dialogueSlug);
             }
         }
+
+        if (newEvent.type === "enemy") {
+            const enemySlug = newEvent.slug;
+            if (!hasSeenEvent(enemySlug)) {
+                eventActive = true;
+                initCombat(enemySlug);
+                markEventSeen(enemySlug);
+            }
+        }
     }
+}
+
+function initCombat(enemySlug) {
+    const enemy = enemyData.enemies.find(enemy => enemy.slug === enemySlug);
+
+    const newCombat = document.createElement("div");
+    newCombat.className = "adventure-log__new-combat";
+    newCombat.textContent = enemy.event;
+    adventureLog.prepend(newCombat);
+
+    const continueButton = document.createElement("button");
+    continueButton.textContent = "Continue";
+    continueButton.className = "dialogue-button";
+    newCombat.appendChild(continueButton);
+    continueButton.addEventListener("click", ()=> {
+        endEvent();
+        newCombat.removeChild(continueButton);
+    });
 }
 
 function initEvent(eventSlug) {
@@ -229,6 +266,7 @@ function initDialogue(dialogueSlug, stateKey) {
         console.error(`State "${currentStateKey}" not found in dialogue "${dialogueSlug}"`);
         return;
     }
+
     console.log(currentState);
 
     const description = document.createElement("p");
@@ -284,11 +322,17 @@ function clearStorage() {
     localStorage.clear();
 }
 
-function blockedPath(dx, dy) {
-    player.x = player.x - dx;
-    player.y = player.y - dy;
-    const newLogEntry = document.createElement("p");
-    newLogEntry.className = "log-entry";
-    newLogEntry.textContent = "-- you can't walk here";
-    adventureLog.prepend(newLogEntry);
+function isWalkable(x, y, dx, dy) {
+    const tileType = map[y][x];
+
+    const currentTile = tileSet[tileType];
+
+    if (currentTile.walkable === false) {
+        player.x = player.x - dx;
+        player.y = player.y - dy;
+        const newLogEntry = document.createElement("p");
+        newLogEntry.className = "log-entry";
+        newLogEntry.textContent = "-- you can't walk here";
+        adventureLog.prepend(newLogEntry);
+    }
 }

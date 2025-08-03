@@ -76,6 +76,10 @@ body {
     color: cornflowerblue;
 }
 
+.adventure-log__new-combat {
+    color: rosybrown;
+}
+
 .log-entry {
     color: chocolate;
 }

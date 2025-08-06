@@ -17,6 +17,10 @@ let enemyData = {};
 let eventActive = false;
 const adventureLog = document.querySelector(".adventure-log");
 
+let mightCharacteristics = 0;
+let reputationCharacteristics = 0;
+let prayerCharacteristics = 0;
+
 //load data
 function loadLevelData() {
     fetch("/roguelike-game/load-level")
@@ -295,6 +299,16 @@ function initDialogue(dialogueSlug, stateKey) {
             options.appendChild(button);
         });
     } else {
+
+        dialogue.finalOutcome = {
+            description: currentState.description,
+            result: stateKey
+        }
+
+        const dialogueOutcome = dialogue.finalOutcome.result;
+
+        registerDialogueOutcome(dialogueOutcome);
+
         const continueButton = document.createElement("button");
         continueButton.textContent = "Continue";
         continueButton.className = "dialogue-button";
@@ -302,6 +316,7 @@ function initDialogue(dialogueSlug, stateKey) {
         continueButton.addEventListener("click", () => {
             endEvent();
             options.removeChild(continueButton);
+            console.log("Final outcome registered:", dialogue.finalOutcome);
         });
     }
 }
@@ -334,5 +349,25 @@ function isWalkable(x, y, dx, dy) {
         newLogEntry.className = "log-entry";
         newLogEntry.textContent = "-- you can't walk here";
         adventureLog.prepend(newLogEntry);
+    }
+}
+
+function registerDialogueOutcome(dialogueOutcome) {
+    if (dialogueOutcome === "reputation") {
+        reputationCharacteristics++;
+        const repCharCount = document.querySelector(".reputation-characteristic-count");
+        repCharCount.textContent = String(reputationCharacteristics);
+    }
+
+    if (dialogueOutcome === "might") {
+        mightCharacteristics++;
+        const mightCharCount = document.querySelector(".might-characteristic-count");
+        mightCharCount.textContent = String(mightCharacteristics);
+    }
+    
+    if (dialogueOutcome === "prayer") {
+        prayerCharacteristics++;
+        const prayCharCount = document.querySelector(".prayers-characteristic-count");
+        prayCharCount.textContent = String(prayerCharacteristics);
     }
 }

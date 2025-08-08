@@ -1,6 +1,6 @@
 //constants
 let map = [];
-let player = { x: 0, y: 0 };
+let player = {x: 0, y: 0};
 let tileSet = {};
 
 let levelData = {};
@@ -17,9 +17,20 @@ let enemyData = {};
 let eventActive = false;
 const adventureLog = document.querySelector(".adventure-log");
 
-let mightCharacteristics = 0;
-let reputationCharacteristics = 0;
-let prayerCharacteristics = 0;
+const playerCharacteristics = {
+    reputation: 5,
+    might: 6,
+    prayer: 7,
+};
+
+const displayReputation = document.querySelector(".reputation-characteristic-count");
+displayReputation.textContent = playerCharacteristics.reputation;
+
+const displayMight = document.querySelector(".might-characteristic-count");
+displayMight.textContent = playerCharacteristics.might;
+
+const displayPrayer = document.querySelector(".prayer-characteristic-count");
+displayPrayer.textContent = playerCharacteristics.prayer;
 
 //load data
 function loadLevelData() {
@@ -100,11 +111,20 @@ document.addEventListener("DOMContentLoaded", () => {
         let dx = 0, dy = 0;
 
         switch (e.key) {
-            case "ArrowUp": dy = -1; break;
-            case "ArrowDown": dy = 1; break;
-            case "ArrowLeft": dx = -1; break;
-            case "ArrowRight": dx = 1; break;
-            default: return;
+            case "ArrowUp":
+                dy = -1;
+                break;
+            case "ArrowDown":
+                dy = 1;
+                break;
+            case "ArrowLeft":
+                dx = -1;
+                break;
+            case "ArrowRight":
+                dx = 1;
+                break;
+            default:
+                return;
         }
 
         const newX = player.x + dx;
@@ -194,6 +214,11 @@ function checkForAnyEvent(x, y) {
     console.log(newEvent);
 
     if (newEvent) {
+
+        if (!characteristicCheck(newEvent)) {
+            return;
+        }
+
         if (newEvent.type === "event") {
             const eventSlug = newEvent.slug;
             if (!hasSeenEvent(eventSlug)) {
@@ -220,6 +245,7 @@ function checkForAnyEvent(x, y) {
                 markEventSeen(enemySlug);
             }
         }
+
     }
 }
 
@@ -235,7 +261,7 @@ function initCombat(enemySlug) {
     continueButton.textContent = "Continue";
     continueButton.className = "dialogue-button";
     newCombat.appendChild(continueButton);
-    continueButton.addEventListener("click", ()=> {
+    continueButton.addEventListener("click", () => {
         endEvent();
         newCombat.removeChild(continueButton);
     });
@@ -254,7 +280,7 @@ function initEvent(eventSlug) {
     continueButton.textContent = "Continue";
     continueButton.className = "dialogue-button";
     newEvent.appendChild(continueButton);
-    continueButton.addEventListener("click", ()=> {
+    continueButton.addEventListener("click", () => {
         endEvent();
         newEvent.removeChild(continueButton);
     });
@@ -300,12 +326,14 @@ function initDialogue(dialogueSlug, stateKey) {
         });
     } else {
 
+        const finalState = dialogue[stateKey];
+
         dialogue.finalOutcome = {
-            description: currentState.description,
-            result: stateKey
+            description: finalState.description,
+            characteristics: finalState.characteristics
         }
 
-        const dialogueOutcome = dialogue.finalOutcome.result;
+        const dialogueOutcome = dialogue.finalOutcome.characteristics;
 
         registerDialogueOutcome(dialogueOutcome);
 
@@ -353,21 +381,40 @@ function isWalkable(x, y, dx, dy) {
 }
 
 function registerDialogueOutcome(dialogueOutcome) {
-    if (dialogueOutcome === "reputation") {
-        reputationCharacteristics++;
-        const repCharCount = document.querySelector(".reputation-characteristic-count");
-        repCharCount.textContent = String(reputationCharacteristics);
-    }
+    for (const [key, value] of Object.entries(dialogueOutcome)) {
+        playerCharacteristics[key] += value;
 
-    if (dialogueOutcome === "might") {
-        mightCharacteristics++;
-        const mightCharCount = document.querySelector(".might-characteristic-count");
-        mightCharCount.textContent = String(mightCharacteristics);
+        const displayCharacteristic = document.querySelector(`.${key}-characteristic-count`);
+        if (displayCharacteristic) {
+            displayCharacteristic.textContent = playerCharacteristics[key];
+        } else {
+            console.warn(`Missing DOM element for: .${key}-characteristic-count`);
+        }
     }
-    
-    if (dialogueOutcome === "prayer") {
-        prayerCharacteristics++;
-        const prayCharCount = document.querySelector(".prayers-characteristic-count");
-        prayCharCount.textContent = String(prayerCharacteristics);
+}
+
+function characteristicCheck(newEvent) {
+
+    if (newEvent.type === "dialogue") {
+        const dialogueSlug = newEvent.slug;
+        const dialogue = dialogueData.dialogues.find(dialogue => dialogue.slug === dialogueSlug);
+
+        if (!dialogue.requirements) {
+            return true;
+        } else {
+
+            const requirements = dialogue.requirements;
+
+            for (const [key, value] of Object.entries(requirements)) {
+                if (playerCharacteristics[key] < value) {
+                    const rejection = document.createElement("div");
+                    rejection.textContent = dialogue.rejection;
+                    adventureLog.prepend(rejection);
+                    return false;
+                }
+            }
+        }
+
     }
+    return true;
 }

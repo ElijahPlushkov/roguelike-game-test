@@ -18,9 +18,9 @@ let eventActive = false;
 const adventureLog = document.querySelector(".adventure-log");
 
 const playerCharacteristics = {
-    reputation: 5,
-    might: 6,
-    prayer: 7,
+    reputation: 1,
+    might: 2,
+    prayer: 0,
 };
 
 const displayReputation = document.querySelector(".reputation-characteristic-count");
@@ -316,6 +316,26 @@ function initDialogue(dialogueSlug, stateKey) {
             button.className = 'dialogue-button';
 
             button.addEventListener("click", () => {
+
+                const optionData = option;
+
+                if (optionData.requirements) {
+                    let canProceed = true;
+
+                    for (const [charKey, requiredValue] of Object.entries(optionData.requirements)) {
+                        if ((playerCharacteristics[charKey] || 0) < requiredValue) {
+                            canProceed = false;
+                            const rejection = document.createElement("div");
+                            rejection.textContent = optionData.rejection || "You cannot do this.";
+                            adventureLog.prepend(rejection);
+                            break;
+                        }
+                    }
+                    if (!canProceed) {
+                        return;
+                    }
+                }
+
                 const nextStateKey = currentState.outcomes?.[option.key];
                 if (nextStateKey) {
                     options.innerHTML = '';

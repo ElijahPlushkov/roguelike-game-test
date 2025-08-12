@@ -8,7 +8,7 @@
         <section class="menu__authentication">
 
             <div class="menu__container">
-                <h2>Register</h2>
+                <h2 class="menu__heading">New Player</h2>
                 <form action="register" method="POST" class="menu__form">
                     <input type="text" name="username" placeholder="Username" required class="menu__input">
                     <input type="password" name="password" placeholder="Password" required class="menu__input">
@@ -17,7 +17,7 @@
             </div>
 
             <div class="menu__container">
-                <h2>Login</h2>
+                <h2 class="menu__heading">Famed Player</h2>
                 <form action="login" method="POST" class="menu__form">
                     <input type="text" name="username" placeholder="Username" required class="menu__input">
                     <input type="password" name="password" placeholder="Password" required class="menu__input">
@@ -80,11 +80,11 @@
         </div>
 
         <div class="menu__button">
-            <a href="upload-level">Level Uploader</a>
+            <a class="menu__link" href="upload-level">Level Uploader</a>
         </div>
 
         <div class="menu__button">
-            <a href="upload-script">Script Uploader</a>
+            <a class="menu__link" href="upload-script">Script Uploader</a>
         </div>
 
         <form action="logout" method="POST">

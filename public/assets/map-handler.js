@@ -111,16 +111,16 @@ document.addEventListener("DOMContentLoaded", () => {
         let dx = 0, dy = 0;
 
         switch (e.key) {
-            case "ArrowUp":
+            case "w":
                 dy = -1;
                 break;
-            case "ArrowDown":
+            case "s":
                 dy = 1;
                 break;
-            case "ArrowLeft":
+            case "a":
                 dx = -1;
                 break;
-            case "ArrowRight":
+            case "d":
                 dx = 1;
                 break;
             default:
@@ -165,9 +165,21 @@ function render() {
                         tile.classList.add("wall");
                         tile.textContent = "#";
                         break;
+                    case "=":
+                        tile.classList.add("wooden-wall");
+                        tile.textContent = "=";
+                        break;
+                    case "α":
+                        tile.classList.add("boulder");
+                        tile.textContent = "α";
+                        break;
                     case ".":
                         tile.classList.add("floor");
                         tile.textContent = ".";
+                        break;
+                    case "□":
+                        tile.classList.add("cobble");
+                        tile.textContent = "□";
                         break;
                     case "T":
                         tile.classList.add("tree");
@@ -181,13 +193,33 @@ function render() {
                         tile.classList.add("enemy");
                         tile.textContent = "E";
                         break;
-                    case "o":
+                    case "Ω":
                         tile.classList.add("item");
-                        tile.textContent = "o";
+                        tile.textContent = "Ω";
                         break;
                     case "П":
                         tile.classList.add("door");
                         tile.textContent = "П";
+                        break;
+                    case "Θ":
+                        tile.classList.add("altar");
+                        tile.textContent = "Θ";
+                        break;
+                    case "t":
+                        tile.classList.add("short-tree");
+                        tile.textContent = "t";
+                        break;
+                    case "*":
+                        tile.classList.add("pine-tree");
+                        tile.textContent = "*";
+                        break;
+                    case "▲":
+                        tile.classList.add("mountain");
+                        tile.textContent = "▲";
+                        break;
+                    case "≈":
+                        tile.classList.add("water");
+                        tile.textContent = "≈";
                         break;
                     default:
                         tile.classList.add("unknown");

@@ -1,8 +1,6 @@
-/* === Root Color Palette === */
 :root {
     --background-color: #1e1e1e;
     --surface-color: #1e1e1e;
-    /*--border-color: #A7C3B7;*/
     --accent-color: #6FA89C;
     --accent-hover: #5F978B;
     --text-color: #3F5F5A;
@@ -11,7 +9,6 @@
     --green-3: #4E9B31;
 }
 
-/* === Reset === */
 * {
     padding: 0;
     margin: 0;

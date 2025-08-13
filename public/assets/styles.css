@@ -75,10 +75,7 @@ body {
 }
 
 .menu__button {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-
+    position: relative;
     display: block;
     width: 100%;
     padding: 10px 15px;
@@ -94,7 +91,32 @@ body {
     text-align: center;
     cursor: pointer;
 
-    transition: background 0.2s;
+    transition: all 0.5s ease;
+}
+
+.menu__button:before,
+.menu__button:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.menu__button:before {
+    content: "-=";
+    left: -5px;
+}
+
+.menu__button:after {
+    content: "=-";
+    right: -5px;
+}
+
+.menu__button:hover::before,
+.menu__button:hover::after {
+    opacity: 1;
 }
 
 .menu__input {
@@ -104,8 +126,14 @@ body {
     border: none;
 }
 
-.menu__link:visited {
+.menu__link:visited,
+.menu__link:active, a {
     color: white;
+    text-decoration: none;
+}
+
+.stats-name {
+    list-style: none;
 }
 
 #body {

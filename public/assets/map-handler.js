@@ -282,20 +282,81 @@ function checkForAnyEvent(x, y) {
 }
 
 function initCombat(enemySlug) {
+
     const enemy = enemyData.enemies.find(enemy => enemy.slug === enemySlug);
+
+    const enemyChars = enemy.characteristics;
+    const enemyFleeRequirements = enemy.flee;
 
     const newCombat = document.createElement("div");
     newCombat.className = "adventure-log__new-combat";
-    newCombat.textContent = enemy.event;
+    newCombat.textContent = enemy.description;
     adventureLog.prepend(newCombat);
 
-    const continueButton = document.createElement("button");
-    continueButton.textContent = "Continue";
-    continueButton.className = "dialogue-button";
-    newCombat.appendChild(continueButton);
-    continueButton.addEventListener("click", () => {
-        endEvent();
-        newCombat.removeChild(continueButton);
+    const options = document.createElement("div");
+    newCombat.append(options);
+    options.innerHTML = '';
+
+    enemy.options.forEach(option => {
+        const button = document.createElement("button");
+        button.textContent = option.label;
+        button.className = 'dialogue-button';
+        options.appendChild(button);
+
+        button.addEventListener("click", ()=> {
+            if (button.textContent === "fight") {
+                if (playerCharacteristics.might < enemyChars.might) {
+                    newCombat.textContent = enemy.combatDefeat;
+                } else {
+                    newCombat.textContent = enemy.combatVictory;
+                }
+                const continueButton = document.createElement("button");
+                continueButton.textContent = "Continue";
+                continueButton.className = "dialogue-button";
+                newCombat.appendChild(continueButton);
+                continueButton.addEventListener("click", () => {
+                    endEvent();
+                    newCombat.removeChild(continueButton);
+                });
+            }
+
+            if (button.textContent === "negotiate") {
+                if (playerCharacteristics.reputation < enemyChars.reputation) {
+                    newCombat.textContent = enemy.negotiationDefeat;
+                } else {
+                    newCombat.textContent = enemy.negotiationVictory;
+                }
+                const continueButton = document.createElement("button");
+                continueButton.textContent = "Continue";
+                continueButton.className = "dialogue-button";
+                newCombat.appendChild(continueButton);
+                continueButton.addEventListener("click", () => {
+                    endEvent();
+                    newCombat.removeChild(continueButton);
+                });
+            }
+
+            if (button.textContent === "flee") {
+                if (enemy.difficulty === "weak" || enemy.difficulty === "average") {
+                    newCombat.textContent = enemy.fleeSuccess;
+                } else {
+                    if (playerCharacteristics.might < enemyFleeRequirements.might ||
+                        playerCharacteristics.prayer < enemyFleeRequirements.prayer) {
+                        newCombat.textContent = enemy.fleeFailure;
+                    } else {
+                        newCombat.textContent = enemy.fleeSuccess;
+                    }
+                }
+                const continueButton = document.createElement("button");
+                continueButton.textContent = "Continue";
+                continueButton.className = "dialogue-button";
+                newCombat.appendChild(continueButton);
+                continueButton.addEventListener("click", () => {
+                    endEvent();
+                    newCombat.removeChild(continueButton);
+                });
+            }
+        });
     });
 }
 

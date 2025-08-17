@@ -10,10 +10,10 @@ $chapterName = "Chapter 1 Spring Blossom";
 <section class="game-info">
 
     <div class="players-info">
-        <div class="players-info__item">-=REP <span class="reputation-characteristic-count">0</span>=-</div>
-        <div class="players-info__item">-=MIGHT <span class="might-characteristic-count">0</span>=-</div>
-        <div class="players-info__item">-=PRAYERS <span class="prayer-characteristic-count">0</span>=-</div>
-        <div class="players-info__item">-=GOLD <span class="gold-quantity-count">100</span>=-</div>
+        <div class="players-info__item">-=HP 100/100=-</div>
+        <div class="players-info__item">-=REP 34=-</div>
+        <div class="players-info__item">-=GOLD 200=-</div>
+        <div class="players-info__item">-=Prayers 3=-</div>
     </div>
 
     <div class="game-info__divider">||</div>

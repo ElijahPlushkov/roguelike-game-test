@@ -1,6 +1,6 @@
 <body>
 <section class="game-name">
-    <h2 class="game-name__title">Game's Name</h2>
+    <h2 class="game-name__title">Beetlejust</h2>
 </section>
 
 <div class="menu-container">
@@ -8,7 +8,7 @@
         <section class="menu__authentication">
 
             <div class="menu__container">
-                <h2>Register</h2>
+                <h2 class="menu__heading">New Player</h2>
                 <form action="register" method="POST" class="menu__form">
                     <input type="text" name="username" placeholder="Username" required class="menu__input">
                     <input type="password" name="password" placeholder="Password" required class="menu__input">
@@ -17,7 +17,7 @@
             </div>
 
             <div class="menu__container">
-                <h2>Login</h2>
+                <h2 class="menu__heading">Famed Player</h2>
                 <form action="login" method="POST" class="menu__form">
                     <input type="text" name="username" placeholder="Username" required class="menu__input">
                     <input type="password" name="password" placeholder="Password" required class="menu__input">
@@ -28,7 +28,7 @@
         </section>
     <?php else : ?>
         <section class="menu__container">
-            <h2>User Profile</h2>
+            <h2 class="menu__heading">User Profile</h2>
 
             <div class="profile-section">
                 <div class="profile-info">
@@ -40,14 +40,13 @@
                         <?php echo htmlspecialchars($about); ?>
                     </p>
                 </div>
-
+                <br>
                 <div class="stats-section">
-                    <h3>Statistics</h3>
+                    <h2 class="menu__heading">Statistics</h2>
                     <ul class="stats-list">
-                        <li>Games Played: <span class="stat-value">-</span></li>
-                        <li>Wins: <span class="stat-value">-</span></li>
-                        <li>Losses: <span class="stat-value">-</span></li>
-                        <li>High Score: <span class="stat-value">-</span></li>
+                        <li class="stats-name">Chapters completed: <span class="stat-value">-</span></li>
+                        <li class="stats-name">Enemies slayed: <span class="stat-value">-</span></li>
+                        <li class="stats-name">Pollen collected: <span class="stat-value">-</span></li>
                     </ul>
                 </div>
                 <form action="user-profile" method="POST">
@@ -80,11 +79,11 @@
         </div>
 
         <div class="menu__button">
-            <a href="upload-level">Level Uploader</a>
+            <a class="menu__link" href="upload-level">Level Uploader</a>
         </div>
 
         <div class="menu__button">
-            <a href="upload-script">Script Uploader</a>
+            <a class="menu__link" href="upload-script">Script Uploader</a>
         </div>
 
         <form action="logout" method="POST">

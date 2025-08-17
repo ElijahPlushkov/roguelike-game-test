@@ -1,8 +1,6 @@
-/* === Root Color Palette === */
 :root {
     --background-color: #1e1e1e;
     --surface-color: #1e1e1e;
-    /*--border-color: #A7C3B7;*/
     --accent-color: #6FA89C;
     --accent-hover: #5F978B;
     --text-color: #3F5F5A;
@@ -11,7 +9,6 @@
     --green-3: #4E9B31;
 }
 
-/* === Reset === */
 * {
     padding: 0;
     margin: 0;
@@ -23,7 +20,6 @@ body {
     flex-direction: column;
     align-items: center;
     font-family: "Cascadia Code", sans-serif;
-    height: 100vh;
 }
 
 .game-info {
@@ -57,14 +53,15 @@ body {
 .map-display {
     width: 1024px;
     border-radius: 5px;
+    overflow-y: scroll;
 }
 
 .adventure-log {
     border-radius: 5px;
     width: 1024px;
     overflow-y: scroll;
-    height: 30vh;
     font-size: 12px;
+    max-height: 20vh;
 }
 
 .adventure-log__divider {
@@ -74,6 +71,10 @@ body {
 
 .adventure-log__new-event {
     color: cornflowerblue;
+}
+
+.adventure-log__new-combat {
+    color: rosybrown;
 }
 
 .log-entry {
@@ -121,12 +122,40 @@ body {
     background-color: #3A3D35;
 }
 
+.wooden-wall {
+    background-color: saddlebrown;
+}
+
 .floor {
     background-color: #D9E6DA;
 }
 
+.boulder {
+    background-color: grey;
+}
+
+.cobble {
+    background-color: sandybrown;
+}
+
 .tree {
     background-color: #5B8C5A;
+}
+
+.short-tree {
+    background-color: #5B754A;
+}
+
+.pine-tree {
+    background-color: darkolivegreen;
+}
+
+.mountain {
+    background-color: slategrey;
+}
+
+.water {
+    background-color: cadetblue;
 }
 
 .npc {
@@ -143,6 +172,10 @@ body {
 
 .door {
     background-color: #A3B186;
+}
+
+.altar {
+    background-color: white;
 }
 
 .player {

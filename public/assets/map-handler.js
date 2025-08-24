@@ -19,7 +19,7 @@ const adventureLog = document.querySelector(".adventure-log");
 
 const playerCharacteristics = {
     reputation: 0,
-    might: 1,
+    might: 0,
     prayer: 0,
 };
 
@@ -33,6 +33,9 @@ displayMight.textContent = playerCharacteristics.might;
 
 const displayPrayer = document.querySelector(".prayer-characteristic-count");
 displayPrayer.textContent = playerCharacteristics.prayer;
+
+const displayPollen = document.querySelector(".pollen-quantity-count");
+displayPollen.textContent = pollen;
 
 //load data
 function loadLevelData() {
@@ -132,15 +135,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const newX = player.x + dx;
         const newY = player.y + dy;
 
-        if (map[newY][newX]) {
+        if (isWalkable(newX, newY, dx, dy)) {
             player.x = newX;
             player.y = newY;
-
-            isWalkable(player.x, player.y, dx, dy);
-            checkForAnyEvent(player.x, player.y);
-
-            render();
         }
+
+        checkForAnyEvent(player.x, player.y);
+
+        render();
+
     });
 });
 
@@ -284,6 +287,21 @@ function checkForAnyEvent(x, y) {
     }
 }
 
+function isWalkable(x, y) {
+    const tileType = map[y][x];
+
+    const currentTile = tileSet[tileType];
+
+    if (currentTile.walkable === false) {
+        const newLogEntry = document.createElement("p");
+        newLogEntry.className = "log-entry";
+        newLogEntry.textContent = "-you can't walk here";
+        adventureLog.prepend(newLogEntry);
+        return false;
+    }
+    return true;
+}
+
 function initCombat(enemySlug) {
 
     const enemy = enemyData.enemies.find(enemy => enemy.slug === enemySlug);
@@ -314,11 +332,11 @@ function initCombat(enemySlug) {
             if (button.textContent === "fight") {
                 if (playerCharacteristics.might < enemyChars.might) {
                     isSuccessful = false;
-                    newCombat.textContent = enemy.combatDefeat + " " + resolveCombat(enemyDifficulty, isSuccessful);
+                    newCombat.textContent = enemy.combatDefeat + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
 
                 } else {
                     isSuccessful = true;
-                    newCombat.textContent = enemy.combatVictory + " " + resolveCombat(enemyDifficulty, isSuccessful);
+                    newCombat.textContent = enemy.combatVictory + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
 
                 }
                 appendContinueButton(eventType);
@@ -327,10 +345,10 @@ function initCombat(enemySlug) {
             if (button.textContent === "negotiate") {
                 if (playerCharacteristics.reputation < enemyChars.reputation) {
                     isSuccessful = false;
-                    newCombat.textContent = enemy.negotiationDefeat + " " + resolveCombat(enemyDifficulty, isSuccessful);
+                    newCombat.textContent = enemy.negotiationDefeat + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                 } else {
                     isSuccessful = true;
-                    newCombat.textContent = enemy.negotiationVictory + " " + resolveCombat(enemyDifficulty, isSuccessful);
+                    newCombat.textContent = enemy.negotiationVictory + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                 }
                 appendContinueButton(eventType);
             }
@@ -338,18 +356,18 @@ function initCombat(enemySlug) {
             if (button.textContent === "flee") {
                 if (enemyDifficulty === "weak" || enemyDifficulty === "average") {
                     isSuccessful = false;
-                    newCombat.textContent = enemy.fleeSuccess + " " + resolveCombat(enemyDifficulty, isSuccessful);
+                    newCombat.textContent = enemy.fleeSuccess + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                 } else {
                     if (playerCharacteristics.might < enemyFleeRequirements.might ||
                         playerCharacteristics.prayer < enemyFleeRequirements.prayer) {
                         isSuccessful = false;
-                        newCombat.textContent = enemy.fleeFailure + " " + resolveCombat(enemyDifficulty, isSuccessful);
+                        newCombat.textContent = enemy.fleeFailure + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                     } else if (enemyDifficulty === "boss") {
                         isSuccessful = false;
-                        newCombat.textContent = enemy.fleeFailure + " " + resolveCombat(enemyDifficulty, isSuccessful);
+                        newCombat.textContent = enemy.fleeFailure + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                     } else {
                         isSuccessful = false;
-                        newCombat.textContent = enemy.fleeSuccess + " " + resolveCombat(enemyDifficulty, isSuccessful);
+                        newCombat.textContent = enemy.fleeSuccess + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                     }
                 }
                 appendContinueButton(eventType);
@@ -371,10 +389,11 @@ function appendContinueButton(eventType) {
     });
 }
 
-function resolveCombat(enemyDifficulty, isSuccessful) {
+function resolveCombat(enemyDifficulty, isSuccessful, pollen) {
 
     let increase;
     let decrease;
+    let pollenChange;
 
     const characteristics = Object.keys(playerCharacteristics);
     const charKey = characteristics[Math.floor(Math.random() * characteristics.length)];
@@ -384,34 +403,58 @@ function resolveCombat(enemyDifficulty, isSuccessful) {
     if (enemyDifficulty === "weak") {
         increase = 1;
         decrease = -1;
+        pollenChange = Math.floor(Math.random() * 10) + 1;
     } else if (enemyDifficulty === "average") {
         increase = 2;
         decrease = -2;
+        pollenChange = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
     } else if (enemyDifficulty === "tough") {
         increase = 3;
         decrease = -4;
+        pollenChange = Math.floor(Math.random() * (40 - 20 + 1)) + 20;
     } else if (enemyDifficulty === "master") {
         increase = 4;
         decrease = -6;
+        pollenChange = Math.floor(Math.random() * (60 - 40 + 1)) + 40;
     } else if (enemyDifficulty === "boss") {
         increase = 5;
         decrease = -8;
+        pollenChange = Math.floor(Math.random() * (80 - 60 + 1)) + 60;
     }
 
     if (isSuccessful === false) {
         playerCharacteristics[charKey] += decrease;
         displayCharacteristic.textContent = playerCharacteristics[charKey];
-        return "your" + " " + `${charKey}` + " " + "decreased by" + " " + `${decrease}`;
+        displayPollen.textContent = pollen - pollenChange;
+        return `Your ${charKey} decreased by ${Math.abs(decrease)}`;
     } else {
         playerCharacteristics[charKey] += increase;
         displayCharacteristic.textContent = playerCharacteristics[charKey];
-        return "your" + " " + `${charKey}` + " " + "increased by" + " " + `${increase}`;
+        displayPollen.textContent = pollen + pollenChange;
+        return `Your ${charKey} increased by ${increase}`;
     }
 }
 
 function initEvent(eventSlug) {
 
     const event = eventData.events.find(event => event.slug === eventSlug);
+
+    if (event.requirements) {
+        let canProceed = true;
+
+        for (const [charKey, requiredValue] of Object.entries(event.requirements)) {
+            if ((playerCharacteristics[charKey] || 0) < requiredValue) {
+                canProceed = false;
+                const rejection = document.createElement("div");
+                rejection.textContent = event.rejection || "You are not worthy to witness";
+                adventureLog.prepend(rejection);
+                break;
+            }
+        }
+        if (!canProceed) {
+            return;
+        }
+    }
 
     const newEvent = document.createElement("div");
     const eventType = newEvent;
@@ -420,6 +463,9 @@ function initEvent(eventSlug) {
     adventureLog.prepend(newEvent);
 
     appendContinueButton(eventType);
+
+    const reward = event.reward;
+    registerEventOutcome(reward);
 }
 
 function initDialogue(dialogueSlug, stateKey) {
@@ -472,7 +518,7 @@ function initDialogue(dialogueSlug, stateKey) {
                     }
                 }
 
-                const nextStateKey = currentState.outcomes?.[option.key];
+                const nextStateKey = option.key;
                 if (nextStateKey) {
                     options.innerHTML = '';
                     initDialogue(dialogueSlug, nextStateKey);
@@ -521,21 +567,6 @@ function clearStorage() {
     localStorage.clear();
 }
 
-function isWalkable(x, y, dx, dy) {
-    const tileType = map[y][x];
-
-    const currentTile = tileSet[tileType];
-
-    if (currentTile.walkable === false) {
-        player.x = player.x - dx;
-        player.y = player.y - dy;
-        const newLogEntry = document.createElement("p");
-        newLogEntry.className = "log-entry";
-        newLogEntry.textContent = "-- you can't walk here";
-        adventureLog.prepend(newLogEntry);
-    }
-}
-
 function registerDialogueOutcome(dialogueOutcome) {
     for (const [key, value] of Object.entries(dialogueOutcome)) {
         playerCharacteristics[key] += value;
@@ -543,13 +574,38 @@ function registerDialogueOutcome(dialogueOutcome) {
         const displayCharacteristic = document.querySelector(`.${key}-characteristic-count`);
         if (displayCharacteristic) {
             displayCharacteristic.textContent = playerCharacteristics[key];
+
+            const charChange = document.createElement("p");
+            charChange.className = "log-entry";
+            charChange.textContent = `Your reward: ${value} ${key}`;
+            adventureLog.prepend(charChange);
+
         } else {
             console.warn(`Missing DOM element for: .${key}-characteristic-count`);
         }
     }
 }
 
-function characteristicCheck(newEvent) {
+function registerEventOutcome(reward) {
+    for (const [key, value] of Object.entries(reward)) {
+        playerCharacteristics[key] += value;
+
+        const displayCharacteristic = document.querySelector(`.${key}-characteristic-count`);
+        if (displayCharacteristic) {
+            displayCharacteristic.textContent = playerCharacteristics[key];
+
+            const charChange = document.createElement("p");
+            charChange.className = "log-entry";
+            charChange.textContent = `Your reward: ${value} ${key}`;
+            adventureLog.prepend(charChange);
+
+        } else {
+            console.warn(`Missing DOM element for: .${key}-characteristic-count`);
+        }
+    }
+}
+
+function characteristicCheck(newEvent, dy, dx) {
 
     if (newEvent.type === "dialogue") {
         const dialogueSlug = newEvent.slug;
@@ -570,7 +626,26 @@ function characteristicCheck(newEvent) {
                 }
             }
         }
+    }
+    if (newEvent.type === "event") {
+        const eventSlug = newEvent.slug;
+        const event = eventData.events.find(event => event.slug === eventSlug);
 
+        if (!event.requirements) {
+            return true;
+        } else {
+
+            const requirements = event.requirements;
+
+            for (const [key, value] of Object.entries(requirements)) {
+                if (playerCharacteristics[key] < value) {
+                    const rejection = document.createElement("div");
+                    rejection.textContent = event.rejection;
+                    adventureLog.prepend(rejection);
+                    return false;
+                }
+            }
+        }
     }
     return true;
 }

@@ -17,7 +17,9 @@ class LevelController extends Dbh {
             return;
         }
 
-        $stmt = $this->db->prepare("INSERT INTO levels (name, slug, level_data) VALUES (?, ?, ?)");
+        $stmt = $this->db->prepare("INSERT INTO levels (name, slug, level_data) VALUES (?, ?, ?) 
+        ON DUPLICATE KEY UPDATE name = VALUES(name), level_data = VALUES(level_data)");
+
         $stmt->execute([$name,
                         $slug,
                         json_encode($levelData)

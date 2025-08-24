@@ -17,7 +17,9 @@ class ScriptLoader extends Dbh {
             return;
         }
 
-        $stmt = $this->db->prepare("INSERT INTO scripts (slug, type, script_data) VALUES (?, ?, ?)");
+        $stmt = $this->db->prepare("INSERT INTO scripts (slug, type, script_data) VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE slug = VALUES(slug), script_data = VALUES(script_data)");
+
         $stmt->execute([$slug,
             $type,
             json_encode($scriptData)

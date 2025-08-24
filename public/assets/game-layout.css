@@ -64,9 +64,9 @@ body {
 .adventure-log {
     border-radius: 5px;
     width: 1024px;
+    max-height: 20vh;
     overflow-y: scroll;
     font-size: 12px;
-    max-height: 20vh;
 }
 
 .adventure-log__divider {

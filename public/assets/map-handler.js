@@ -10,6 +10,8 @@ let stateKey = "";
 
 let eventData = {};
 
+let doorData = {};
+
 let itemData = {};
 
 let enemyData = {};
@@ -19,7 +21,7 @@ const adventureLog = document.querySelector(".adventure-log");
 
 const playerCharacteristics = {
     reputation: 0,
-    might: 0,
+    might: 2,
     prayer: 0,
 };
 
@@ -77,6 +79,18 @@ function loadEventData() {
         });
 }
 
+function loadDoorData() {
+    const slug = "chapter_1_doors";
+    fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
+        .then(response => response.json())
+        .then(doors => {
+            doorData = doors;
+        })
+        .catch(err => {
+            console.error("Failed to load script:", err);
+        });
+}
+
 function loadItemData() {
     const slug = "chapter_1_items";
     fetch(`/roguelike-game/load-script?slug=${encodeURIComponent(slug)}`)
@@ -105,9 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
     loadLevelData();
     loadDialogueData();
     loadEventData();
+    loadDoorData();
     loadItemData();
     loadEnemyData();
 
+    //movement
     document.addEventListener("keydown", (e) => {
         if (eventActive) {
             return;
@@ -135,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const newX = player.x + dx;
         const newY = player.y + dy;
 
-        if (isWalkable(newX, newY, dx, dy)) {
+        if (isWalkable(newX, newY)) {
             player.x = newX;
             player.y = newY;
         }
@@ -242,6 +258,7 @@ function checkForAnyEvent(x, y) {
 
     const allEvents = [
         ...(levelData.layers.events || []),
+        // ...(levelData.layers.doors || []),
         ...(levelData.layers.dialogues || []),
         ...(levelData.layers.enemies || []),
         ...(levelData.layers.items || [])
@@ -265,6 +282,14 @@ function checkForAnyEvent(x, y) {
                 markEventSeen(eventSlug);
             }
         }
+
+        // if (newEvent.type === "door") {
+        //     const eventSlug = newEvent.slug;
+        //     if (!hasSeenEvent(eventSlug)) {
+        //         eventActive = true;
+        //         markEventSeen(eventSlug);
+        //     }
+        // }
 
         if (newEvent.type === "dialogue") {
             const dialogueSlug = newEvent.slug;
@@ -299,7 +324,54 @@ function isWalkable(x, y) {
         adventureLog.prepend(newLogEntry);
         return false;
     }
+    if (currentTile.type === "door") {
+        return accessDoor(x, y);
+    }
     return true;
+}
+
+function accessDoor(x, y) {
+    const doors = [...(levelData.layers.doors) || []];
+
+    const doorTile = doors.find(doorTile => doorTile.x === x && doorTile.y === y);
+
+    console.log(doorTile);
+
+    if (!doorTile) {
+        return true;
+    }
+
+    if (doorTile.slug) {
+        const doorSlug = doorTile.slug;
+
+        const door = doorData.doors.find(door => door.slug === doorSlug);
+
+        if (door) {
+            for (const [charKey, requiredValue] of Object.entries(door.requirements)) {
+                if ((playerCharacteristics[charKey] || 0) < requiredValue) {
+                    doorTile.type = "unwalkable";
+                    const rejection = document.createElement("div");
+                    rejection.textContent = door.rejection || "You are not worthy to enter";
+                    adventureLog.prepend(rejection);
+                    return false;
+                }
+            }
+        }
+        if (!hasSeenEvent(doorSlug)) {
+            const newEvent = document.createElement("div");
+            const eventType = newEvent;
+            newEvent.className = "adventure-log__new-event";
+            newEvent.textContent = door.description;
+            adventureLog.prepend(newEvent);
+
+            const reward = door.reward;
+            registerEventOutcome(reward);
+
+            appendContinueButton(eventType);
+            markEventSeen(doorSlug);
+        }
+        return true;
+    }
 }
 
 function initCombat(enemySlug) {
@@ -389,7 +461,7 @@ function appendContinueButton(eventType) {
     });
 }
 
-function resolveCombat(enemyDifficulty, isSuccessful, pollen) {
+function resolveCombat(enemyDifficulty, isSuccessful) {
 
     let increase;
     let decrease;
@@ -425,13 +497,13 @@ function resolveCombat(enemyDifficulty, isSuccessful, pollen) {
     if (isSuccessful === false) {
         playerCharacteristics[charKey] += decrease;
         displayCharacteristic.textContent = playerCharacteristics[charKey];
-        displayPollen.textContent = pollen - pollenChange;
-        return `Your ${charKey} decreased by ${Math.abs(decrease)}`;
+        displayPollen.textContent = pollen -= pollenChange;
+        return `Your ${charKey} decreased by ${Math.abs(decrease)}. You lose ${pollenChange} pollen grains`;
     } else {
         playerCharacteristics[charKey] += increase;
         displayCharacteristic.textContent = playerCharacteristics[charKey];
-        displayPollen.textContent = pollen + pollenChange;
-        return `Your ${charKey} increased by ${increase}`;
+        displayPollen.textContent = pollen += pollenChange;
+        return `Your ${charKey} increased by ${increase}. You collect ${pollenChange} pollen grains`;
     }
 }
 
@@ -587,25 +659,41 @@ function registerDialogueOutcome(dialogueOutcome) {
 }
 
 function registerEventOutcome(reward) {
-    for (const [key, value] of Object.entries(reward)) {
-        playerCharacteristics[key] += value;
 
-        const displayCharacteristic = document.querySelector(`.${key}-characteristic-count`);
-        if (displayCharacteristic) {
-            displayCharacteristic.textContent = playerCharacteristics[key];
+    for (const [key, value] of Object.entries(reward)) {
+
+        if (key === "pollen") {
+            pollen += value;
+            displayPollen.textContent = pollen;
 
             const charChange = document.createElement("p");
             charChange.className = "log-entry";
-            charChange.textContent = `Your reward: ${value} ${key}`;
+            charChange.textContent = `Your reward: ${value} ${key} pollen grains`;
             adventureLog.prepend(charChange);
+        }
 
-        } else {
-            console.warn(`Missing DOM element for: .${key}-characteristic-count`);
+        else {
+
+            playerCharacteristics[key] += value;
+
+            const displayCharacteristic = document.querySelector(`.${key}-characteristic-count`);
+
+            if (displayCharacteristic) {
+                displayCharacteristic.textContent = playerCharacteristics[key];
+
+                const charChange = document.createElement("p");
+                charChange.className = "log-entry";
+                charChange.textContent = `Your reward: ${value} ${key}`;
+                adventureLog.prepend(charChange);
+
+            } else {
+                console.warn(`Missing DOM element for: .${key}-characteristic-count`);
+            }
         }
     }
 }
 
-function characteristicCheck(newEvent, dy, dx) {
+function characteristicCheck(newEvent) {
 
     if (newEvent.type === "dialogue") {
         const dialogueSlug = newEvent.slug;

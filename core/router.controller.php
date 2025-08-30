@@ -48,4 +48,8 @@ class RouterController extends Router{
     public function uploadScript() {
         require __DIR__ . "/../app/views/upload-script.view.php";
     }
+
+    public function deathScreen() {
+        require __DIR__ . "/../app/views/death-screen.view.php";
+    }
 }

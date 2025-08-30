@@ -21,7 +21,7 @@ const adventureLog = document.querySelector(".adventure-log");
 
 const playerCharacteristics = {
     reputation: 0,
-    might: 2,
+    might: 0,
     prayer: 0,
 };
 
@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //movement
     document.addEventListener("keydown", (e) => {
+        checkMight();
         if (eventActive) {
             return;
         }
@@ -142,6 +143,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 dx = -1;
                 break;
             case "d":
+                dx = 1;
+                break;
+
+            case "ц":
+                dy = -1;
+                break;
+            case "ы":
+                dy = 1;
+                break;
+            case "ф":
+                dx = -1;
+                break;
+            case "в":
                 dx = 1;
                 break;
             default:
@@ -258,7 +272,6 @@ function checkForAnyEvent(x, y) {
 
     const allEvents = [
         ...(levelData.layers.events || []),
-        // ...(levelData.layers.doors || []),
         ...(levelData.layers.dialogues || []),
         ...(levelData.layers.enemies || []),
         ...(levelData.layers.items || [])
@@ -282,14 +295,6 @@ function checkForAnyEvent(x, y) {
                 markEventSeen(eventSlug);
             }
         }
-
-        // if (newEvent.type === "door") {
-        //     const eventSlug = newEvent.slug;
-        //     if (!hasSeenEvent(eventSlug)) {
-        //         eventActive = true;
-        //         markEventSeen(eventSlug);
-        //     }
-        // }
 
         if (newEvent.type === "dialogue") {
             const dialogueSlug = newEvent.slug;
@@ -399,65 +404,69 @@ function initCombat(enemySlug) {
         button.className = 'dialogue-button';
         options.appendChild(button);
 
-        button.addEventListener("click", ()=> {
+        button.addEventListener("click", () => {
 
             if (button.textContent === "fight") {
-                if (playerCharacteristics.might < enemyChars.might) {
+                if (enemyChars.might - playerCharacteristics.might >= 2
+                    && !["flimsy", "weak", "average"].includes(enemyDifficulty)) {
+                    options.innerHTML = '';
+                    handleDeath();
+                    return;
+                } else if (enemyChars.might - playerCharacteristics.might === 1) {
                     isSuccessful = false;
-                    newCombat.textContent = enemy.combatDefeat + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
-
-                } else {
+                    newCombat.textContent = enemy.combatDefeat + " "
+                        + resolveCombat(enemyDifficulty, isSuccessful, pollen);
+                }
+                else {
                     isSuccessful = true;
-                    newCombat.textContent = enemy.combatVictory + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
-
+                    newCombat.textContent = enemy.combatVictory + " "
+                        + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                 }
                 appendContinueButton(eventType);
             }
 
             if (button.textContent === "negotiate") {
-                if (playerCharacteristics.reputation < enemyChars.reputation) {
+                if (enemyChars.reputation - playerCharacteristics.reputation >= 2) {
+                    options.innerHTML = '';
+                    handleDeath();
+                    return;
+                } else if (enemyChars.reputation - playerCharacteristics.reputation === 1) {
                     isSuccessful = false;
-                    newCombat.textContent = enemy.negotiationDefeat + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
+                    newCombat.textContent = enemy.negotiationDefeat + " "
+                        + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                 } else {
                     isSuccessful = true;
-                    newCombat.textContent = enemy.negotiationVictory + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
+                    newCombat.textContent = enemy.negotiationVictory + " "
+                        + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                 }
                 appendContinueButton(eventType);
             }
 
             if (button.textContent === "flee") {
-                if (enemyDifficulty === "weak" || enemyDifficulty === "average") {
+                if (enemyDifficulty === "flimsy" || enemyDifficulty === "weak" || enemyDifficulty === "average") {
                     isSuccessful = false;
-                    newCombat.textContent = enemy.fleeSuccess + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
+                    newCombat.textContent = enemy.fleeSuccess + " "
+                        + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                 } else {
-                    if (playerCharacteristics.might < enemyFleeRequirements.might ||
+                    if (enemyDifficulty === "boss" || enemyDifficulty === "legendary") {
+                        options.innerHTML = '';
+                        handleDeath();
+                        return;
+                    }
+                    else if (playerCharacteristics.might < enemyFleeRequirements.might ||
                         playerCharacteristics.prayer < enemyFleeRequirements.prayer) {
                         isSuccessful = false;
-                        newCombat.textContent = enemy.fleeFailure + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
-                    } else if (enemyDifficulty === "boss") {
-                        isSuccessful = false;
-                        newCombat.textContent = enemy.fleeFailure + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
+                        newCombat.textContent = enemy.fleeFailure + " "
+                            + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                     } else {
                         isSuccessful = false;
-                        newCombat.textContent = enemy.fleeSuccess + " " + resolveCombat(enemyDifficulty, isSuccessful, pollen);
+                        newCombat.textContent = enemy.fleeSuccess + " "
+                            + resolveCombat(enemyDifficulty, isSuccessful, pollen);
                     }
                 }
                 appendContinueButton(eventType);
             }
         });
-    });
-}
-
-function appendContinueButton(eventType) {
-    const newEvent = eventType;
-
-    const continueButton = document.createElement("button");
-    continueButton.textContent = "Continue";
-    continueButton.className = "dialogue-button";
-    newEvent.appendChild(continueButton);
-    continueButton.addEventListener("click", () => {
-        endEvent();
-        newEvent.removeChild(continueButton);
     });
 }
 
@@ -511,23 +520,6 @@ function initEvent(eventSlug) {
 
     const event = eventData.events.find(event => event.slug === eventSlug);
 
-    if (event.requirements) {
-        let canProceed = true;
-
-        for (const [charKey, requiredValue] of Object.entries(event.requirements)) {
-            if ((playerCharacteristics[charKey] || 0) < requiredValue) {
-                canProceed = false;
-                const rejection = document.createElement("div");
-                rejection.textContent = event.rejection || "You are not worthy to witness";
-                adventureLog.prepend(rejection);
-                break;
-            }
-        }
-        if (!canProceed) {
-            return;
-        }
-    }
-
     const newEvent = document.createElement("div");
     const eventType = newEvent;
     newEvent.className = "adventure-log__new-event";
@@ -538,6 +530,29 @@ function initEvent(eventSlug) {
 
     const reward = event.reward;
     registerEventOutcome(reward);
+}
+
+function checkMight() {
+    if (playerCharacteristics.might <= -3) {
+        handleDeath();
+    }
+}
+
+function handleDeath() {
+    const deathMessage = document.createElement("div");
+    deathMessage.textContent = "you are dead";
+    adventureLog.prepend(deathMessage);
+
+    eventActive = true;
+
+    try{
+        setTimeout(function() {
+            window.location.replace('death-screen');
+        }, 2000);
+    } catch (e) {
+        console.log("an error occurred");
+    }
+
 }
 
 function initDialogue(dialogueSlug, stateKey) {
@@ -611,6 +626,11 @@ function initDialogue(dialogueSlug, stateKey) {
 
         registerDialogueOutcome(dialogueOutcome);
 
+        if (stateKey === "death") {
+            handleDeath();
+            return;
+        }
+
         const continueButton = document.createElement("button");
         continueButton.textContent = "Continue";
         continueButton.className = "dialogue-button";
@@ -637,6 +657,19 @@ function markEventSeen(slug) {
 
 function clearStorage() {
     localStorage.clear();
+}
+
+function appendContinueButton(eventType) {
+    const newEvent = eventType;
+
+    const continueButton = document.createElement("button");
+    continueButton.textContent = "Continue";
+    continueButton.className = "dialogue-button";
+    newEvent.appendChild(continueButton);
+    continueButton.addEventListener("click", () => {
+        endEvent();
+        newEvent.removeChild(continueButton);
+    });
 }
 
 function registerDialogueOutcome(dialogueOutcome) {
@@ -724,13 +757,19 @@ function characteristicCheck(newEvent) {
         } else {
 
             const requirements = event.requirements;
-
+            let isDead = false;
             for (const [key, value] of Object.entries(requirements)) {
                 if (playerCharacteristics[key] < value) {
-                    const rejection = document.createElement("div");
-                    rejection.textContent = event.rejection;
-                    adventureLog.prepend(rejection);
-                    return false;
+                    if (event.death === "death") {
+                        isDead = true;
+                        handleDeath();
+                        return false;
+                    } else {
+                        const rejection = document.createElement("div");
+                        rejection.textContent = event.rejection;
+                        adventureLog.prepend(rejection);
+                        return false;
+                    }
                 }
             }
         }

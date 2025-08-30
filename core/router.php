@@ -47,6 +47,10 @@ $router->add("GET", "/upload-script", [RouterController::class, "uploadScript"])
 
 $router->add("POST", "/script-loader.controller", [RouterController::class, "scriptLoaderController"]);
 
+//death screen
+$router->add("POST", "/death-screen", [RouterController::class, "deathScreen"]);
+$router->add("GET", "/death-screen", [RouterController::class, "deathScreen"]);
+
 //initialization
 $basePath = '/roguelike-game';
 
